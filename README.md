@@ -15,26 +15,25 @@ Longest gaps:\
 -- About 8 days each in late December 2019, early January 2020, and June–July 2022\
 -- In total, 23 gaps last a day or longer.
 
-Additionally, the information flags camanchaca (marine low stratus or fog) as present (1) or absent (0) over Copiapó on each day were obtained from the Advanced Baseline Imager (ABI) on the GOES-16 geostationary satellite (GOES-East, sub-satellite point 75.0° W), adopting the unit of analysis of  ~6×6 km box centred on the city, observed once per hour on daylight mornings. All inputs come from NOAA's public GOES-16 archive on Amazon S3 (bucket noaa-goes16, anonymous read access). Full-disk files are NetCDF-4/HDF5, one per scan, stored at <product>/<year>/<day-of-year>/<hour UTC>/.
+Additionally, daily flags marking camanchaca (marine low stratus or fog) as present (1) or absent (0) over Copiapó were obtained from the Advanced Baseline Imager (ABI) on the GOES-East geostationary satellite (75.2° W): GOES-16 until 7 April 2025 and GOES-19, which replaced it as GOES-East, from 8 April 2025. The unit of analysis is a ~6 × 6 km box centred on the city, observed once per hour on daylight mornings. All inputs come from NOAA's public archives on Amazon S3 (buckets `noaa-goes16` and `noaa-goes19`, anonymous read access). Both satellites deliver the same products on the same ABI fixed grid, so the box falls on the same pixels throughout.
 
-| Product | Variable used | Resolution | Archive starts | Role |
-| ------- | ------------- | ---------- | -------------- | ----- |
-| ABI-L2-ACMF (Clear Sky Mask) | BCM: binary cloud mask, 0 clear / 1 cloudy | 2 km | 2 Dec 2019 | Cloud presence for labels |
-| ABI-L2-ACHAF (Cloud Top Height) | HT: cloud-top height, m | 10 km | 2 Dec 2019 | Separates low cloud from cirrus |
-| ABI-L2-CMIPF band C02 | CMI: reflectance factor, 0.64 µm | 0.5 km | before 2019 | Classifier feature (visible) |
-| ABI-L2-CMIPF band C07 | CMI: brightness temperature, 3.9 µm, K | 2 km | before 2019 | Classifier feature (shortwave IR) |
-| ABI-L2-CMIPF band C13 | CMI: brightness temperature, 10.3 µm, K | 2 km | before 2019 | Classifier feature (clean longwave IR) |
-| ABI-L2-CMIPF band C15 | CMI: brightness temperature, 12.3 µm, K | 2 km | before 2019 | Classifier feature (dirty longwave IR) |
+| Product | Variable used | Resolution | Period used | Role |
+| ------- | ------------- | ---------- | ----------- | ---- |
+| ABI-L2-ACMF (Clear Sky Mask) | BCM: binary cloud mask, 0 clear / 1 cloudy | 2 km | 2 Dec 2019 – 30 Oct 2026 | Cloud presence for labels |
+| ABI-L2-ACHAF (Cloud Top Height) | HT: cloud-top height, m | 10 km | 2 Dec 2019 – 30 Oct 2026 | Separates low cloud from cirrus |
+| ABI-L2-CMIPF band C02 | CMI: reflectance factor, 0.64 µm | 0.5 km | 1 Jan 2019 – 30 Oct 2026 | Classifier feature (visible) |
+| ABI-L2-CMIPF band C07 | CMI: brightness temperature, 3.9 µm, K | 2 km | 1 Jan 2019 – 30 Oct 2026 | Classifier feature (shortwave IR) |
+| ABI-L2-CMIPF band C13 | CMI: brightness temperature, 10.3 µm, K | 2 km | 1 Jan 2019 – 30 Oct 2026 | Classifier feature (clean longwave IR) |
+| ABI-L2-CMIPF band C15 | CMI: brightness temperature, 12.3 µm, K | 2 km | 1 Jan 2019 – 30 Oct 2026 | Classifier feature (dirty longwave IR) |
 
-The archive start dates were checked by listing the bucket. ACMF and ACHAF folders for 2019 contain only days 336–365, so the Level-2 labels exist from 2 December 2019. The Cloud and Moisture Imagery (CMIPF) covers the whole study period. Scan cadence changed during the period: ABI Mode 3 (full disk every 15 min) until early April 2019, then Mode 6 (every 10 min). Taking the first scan of each hour makes the sampling identical under both modes. Coverage achieved: 3,455 of 3,468 Level-2 hourly scans (13 hours absent from the archive) and 5,450 of 5,478 band scans (28 hours with a band missing). GOES-16’s archive stops on 7 April 2025, when GOES-19 replaced it.
+The archive start dates were checked by listing the bucket. The GOES-16 ACMF and ACHAF folders for 2019 contain only days 336–365, so the Level-2 labels exist from 2 December 2019; earlier days are flagged by the visible/IR classifier. The Cloud and Moisture Imagery (CMIPF) covers the whole study period. Scan cadence changed during the period: ABI Mode 3 (full disk every 15 min) until early April 2019, then Mode 6 (every 10 min). Taking the first scan of each hour makes the sampling identical under both modes. A flag could be assigned on 2,849 of 2,860 days; the other 11 had too few usable daylight scans. Camanchaca was present on 1,153 days (40.5%).
 
-It joins the two files on date and covers 2,289 days, 2019-01-01 to 2025-04-07, where both files have data. Every satellite date has a matching weather day. Then, the final dataset structure is:
-
+The satellite flags were joined by date to the daily weather summaries from the Dirección Meteorológica de Chile station Copiapó Universidad de Atacama (code 270009), computed from its 1-minute records. The merged dataset covers 2,860 days, 2019-01-01 to 2026-10-30, with every day present in both sources; 2,646 are complete cases. Its structure is:
 
 | Feature | Unit | Description |
 |---|---|---|
 | `date` | YYYY-MM-DD | Local calendar day in Copiapó (America/Santiago time, daylight saving included). |
-| `camanchaca` | 0(NO) / 1(YES) | Camanchaca occurrence on day *t* from GOES-16: 1 if at least 2 morning daylight scans show low cloud over a ~6 × 6 km box on the city (≥ 50% cloudy, median cloud-top height ≤ 4,000 m). |
+| `camanchaca` | 0 (NO) / 1 (YES) | Camanchaca occurrence on day *t* from GOES-16/GOES-19 (see `satellite`): 1 if at least 2 morning daylight scans show low cloud over a ~6 × 6 km box on the city (≥ 50% cloudy, median cloud-top height ≤ 4,000 m). |
 | `hr_q10` | % | 10th percentile of 1-minute relative humidity on day *t*. |
 | `hr_q90` | % | 90th percentile of 1-minute relative humidity on day *t*. |
 | `hr_min_lag1` | % | Minimum 1-minute relative humidity on day *t*−1. |
@@ -53,8 +52,10 @@ It joins the two files on date and covers 2,289 days, 2019-01-01 to 2025-04-07, 
 | `n_min_lag1` | minutes | Smallest number of valid 1-minute readings among the four variables on day *t*−1. |
 | `complete_case` | TRUE/FALSE | TRUE when `camanchaca` and all 14 weather summaries are present. |
 | `source` | — | Method behind `camanchaca`: `L2 cloud mask + cloud-top height` (NOAA cloud products, from 2019-12-02), `visible/IR classifier` (before that date) or `missing`. |
-| `satellite` | — | Satellite used (GOES-16). |
+| `satellite` | — | Satellite used: GOES-16 until 2025-04-07, GOES-19 from 2025-04-08. |
 | `camanchaca_classifier` | 0/1 | Camanchaca flag from the visible/IR classifier for every day, giving a single method with no break at 2019-12-02. |
 | `n_daylight_scans` | count | Usable hourly morning daylight scans on day *t* (11–16 UTC, sun more than 10° above the horizon). |
 | `n_low_scans` | count | Number of those scans showing low cloud over the city. |
 | `min_top_height_m` | m | Lowest median cloud-top height among day *t*'s daylight scans (cloud-product days only). |
+
+Weather summaries with less than 80% of the day's minutes are set to `NA`. Because the flag switches from GOES-16 to GOES-19 on 2025-04-08, the `satellite` column can be used to test for a break at that date.
