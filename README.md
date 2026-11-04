@@ -1,5 +1,5 @@
 # Multivariate Control Chart via Copula (mCCC)
-The time series from weather station 270009, located in the Atacama Desert (Chile), in which raw values per minute were collected from Jan/2019 to Oct/2026. Sources: Datos Estación Automática – Datos minutarios Mensuales (RE3017) | Ficha de la Estación 270009 – Copiapó Universidad de Atacama.
+The time series from weather station 270009, located in the Atacama Desert (Chile), in which raw values per minute were collected from Jan/2019 to Oct/2026 (2,860 days and 2,646 complete cases). Sources: Datos Estación Automática – Datos minutarios Mensuales (RE3017) | Ficha de la Estación 270009 – Copiapó Universidad de Atacama.
 
 | Column |	Source tab → field	| Units |
 | ------------- | ------------- | ------------- |
@@ -58,4 +58,3 @@ The satellite flags were joined by date to the daily weather summaries from the 
 | `n_low_scans` | count | Number of those scans showing low cloud over the city. |
 | `min_top_height_m` | m | Lowest median cloud-top height among day *t*'s daylight scans (cloud-product days only). |
 
-Weather summaries with less than 80% of the day's minutes are set to `NA`. Because the flag switches from GOES-16 to GOES-19 on 2025-04-08, the `satellite` column can be used to test for a break at that date.
